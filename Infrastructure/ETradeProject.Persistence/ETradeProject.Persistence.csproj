@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\ETradeProject.Domain\ETradeProject.Domain.csproj" />
+    <ProjectReference Include="..\..\Core\ETradeProject.Application\ETradeProject.Application.csproj" />
   </ItemGroup>
 
 </Project>
