@@ -2,6 +2,7 @@
 using ETradeProject.Domain.Entities.Common;
 using ETradeProject.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,21 +23,52 @@ namespace ETradeProject.Persistence.Repositories
 
         public DbSet<T> Table => _context.Set<T>();
 
-        public IQueryable<T> GetAll()
-            => Table;
-
-        public IQueryable<T> GetWhere(Expression<Func<T, bool>> method)
-           => Table.Where(method);
-
-
-        public Task<T> GetSingleAsync(Expression<Func<T, bool>> method)
-            => Table.FirstOrDefaultAsync(method);
+        public IQueryable<T> GetAll(bool tracking = true)
+        {
+            var query = Table.AsQueryable();
+            if (!tracking)
+                query = query.AsNoTracking();
+            return query;
+        }
 
 
-        public Task<T> GetByIdAsync(string id)
-            => Table.FirstOrDefaultAsync(data => data.Id == Guid.Parse(id));
+        public IQueryable<T> GetWhere(Expression<Func<T, bool>> method, bool tracking = true)
+        {
+            var query = Table.Where(method);
+            if (!tracking)
+                query = query.AsNoTracking();
+            return query;
+        }
 
-       
-        
+
+
+        public async Task<T> GetSingleAsync(Expression<Func<T, bool>> method, bool tracking = true)
+        {
+            var query = Table.AsQueryable();
+            if (!tracking)
+                query = query.AsNoTracking();
+
+            return await query.FirstOrDefaultAsync();
+
+        }
+
+        //=> Table.FirstOrDefaultAsync(method);
+
+
+        public async Task<T> GetByIdAsync(string id, bool tracking = true)
+        /*Table.FirstOrDefaultAsync(data => data.Id == Guid.Parse(id));*/
+        //=> await Table.FindAsync(Guid.Parse(id));
+        {
+            var query = Table.AsQueryable();
+            if (!tracking)
+                query = query.AsNoTracking();
+
+            return await query.FirstOrDefaultAsync(data => data.Id == Guid.Parse(id));
+
+
+        }
+
+
+
     }
 }
